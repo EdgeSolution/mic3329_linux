@@ -973,6 +973,7 @@ static void autoconfig_16550a(struct uart_8250_port *up)
 		return;
 	}
 
+#if 0
 	/*
 	 * Check for a National Semiconductor SuperIO chip.
 	 * Attempt to switch to bank 2, read the value of the LOOP bit
@@ -1012,6 +1013,7 @@ static void autoconfig_16550a(struct uart_8250_port *up)
 			return;
 		}
 	}
+#endif
 
 	/*
 	 * No EFR.  Try to detect a TI16750, which only sets bit 5 of
@@ -1304,7 +1306,7 @@ static void autoconfig_irq(struct uart_8250_port *up)
 			    UART_MCR_DTR | UART_MCR_RTS);
 	} else {
 		serial_out(up, UART_MCR,
-			    UART_MCR_DTR | UART_MCR_RTS | UART_MCR_OUT2);
+			    UART_MCR_DTR | UART_MCR_RTS | UART_MCR_OUT2 | UART_MCR_LOOP);
 	}
 	serial_out(up, UART_IER, 0x0f);	/* enable all intrs */
 	serial_in(up, UART_LSR);
