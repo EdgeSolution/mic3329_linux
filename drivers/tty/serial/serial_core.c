@@ -171,7 +171,7 @@ static int uart_port_startup(struct tty_struct *tty, struct uart_state *state,
 		 */
 		uart_change_speed(tty, state, NULL);
 
-		if (init_hw) {
+		if (init_hw && uport->line != 1) {
 			/*
 			 * Setup the RTS and DTR signals once the
 			 * port is open and ready to respond.
@@ -1591,10 +1591,12 @@ static void uart_dtr_rts(struct tty_port *port, int onoff)
 	struct uart_state *state = container_of(port, struct uart_state, port);
 	struct uart_port *uport = state->uart_port;
 
-	if (onoff)
-		uart_set_mctrl(uport, TIOCM_DTR | TIOCM_RTS);
-	else
-		uart_clear_mctrl(uport, TIOCM_DTR | TIOCM_RTS);
+	if (uport->line != 1) {
+		if (onoff)
+			uart_set_mctrl(uport, TIOCM_DTR | TIOCM_RTS);
+		else
+			uart_clear_mctrl(uport, TIOCM_DTR | TIOCM_RTS);
+	}
 }
 
 /*

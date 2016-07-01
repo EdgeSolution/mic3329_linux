@@ -973,6 +973,7 @@ static void autoconfig_16550a(struct uart_8250_port *up)
 		return;
 	}
 
+#if 0
 	/*
 	 * Check for a National Semiconductor SuperIO chip.
 	 * Attempt to switch to bank 2, read the value of the LOOP bit
@@ -1012,6 +1013,7 @@ static void autoconfig_16550a(struct uart_8250_port *up)
 			return;
 		}
 	}
+#endif
 
 	/*
 	 * No EFR.  Try to detect a TI16750, which only sets bit 5 of
@@ -1304,7 +1306,7 @@ static void autoconfig_irq(struct uart_8250_port *up)
 			    UART_MCR_DTR | UART_MCR_RTS);
 	} else {
 		serial_out(up, UART_MCR,
-			    UART_MCR_DTR | UART_MCR_RTS | UART_MCR_OUT2);
+			    UART_MCR_DTR | UART_MCR_RTS | UART_MCR_OUT2 | UART_MCR_LOOP);
 	}
 	serial_out(up, UART_IER, 0x0f);	/* enable all intrs */
 	serial_in(up, UART_LSR);
@@ -1929,8 +1931,19 @@ static void serial8250_set_mctrl(struct uart_port *port, unsigned int mctrl)
 	struct uart_8250_port *up = up_to_u8250p(port);
 	unsigned char mcr = 0;
 
-	if (mctrl & TIOCM_RTS)
-		mcr |= UART_MCR_RTS;
+	/*
+	 * We can use port->line to check current serial port
+	 * e.g., ttyS3 => check port->line == 3
+	 *       ttyS0 => check port->line == 0
+	 */
+	if (port->line == 1) {
+		if (!(mctrl & TIOCM_RTS))
+			mcr |= UART_MCR_RTS;
+	} else {
+		if (mctrl & TIOCM_RTS)
+			mcr |= UART_MCR_RTS;
+	}
+
 	if (mctrl & TIOCM_DTR)
 		mcr |= UART_MCR_DTR;
 	if (mctrl & TIOCM_OUT1)
