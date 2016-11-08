@@ -931,6 +931,18 @@ static void i915_hotplug_work_func(struct work_struct *work)
 	bool changed = false;
 	u32 hpd_event_bits;
 
+	int i;
+
+	/* i915_hotplug_work_func work delay 1 minute after hotplug event happened. 
+ 	 * This is VGA hotplug solution.
+ 	 *
+ 	 * New kerver version (4.8.0+) use intel_hpd_irq_storm_disable to solve this problem.
+ 	 * It's only a guess on my part.
+ 	 */
+	for ( i = 0 ; i < 1000 ; i++) {
+		udelay(1000);
+	}
+
 	mutex_lock(&mode_config->mutex);
 	DRM_DEBUG_KMS("running encoder hotplug functions\n");
 
