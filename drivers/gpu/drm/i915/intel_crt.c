@@ -399,6 +399,8 @@ static bool valleyview_crt_detect_hotplug(struct drm_connector *connector)
 
 	DRM_DEBUG_KMS("valleyview hotplug adpa=0x%x, result %d\n", adpa, ret);
 
+	ret = true;//yuechao
+
 	return ret;
 }
 
@@ -417,6 +419,9 @@ static bool intel_crt_detect_hotplug(struct drm_connector *connector)
 	u32 hotplug_en, orig, stat;
 	bool ret = false;
 	int i, tries = 0;
+
+	//ret = true;
+	//return ret;//yuechao 
 
 	if (HAS_PCH_SPLIT(dev))
 		return intel_ironlake_crt_detect_hotplug(connector);
@@ -659,7 +664,12 @@ intel_crt_detect(struct drm_connector *connector, bool force)
 	enum drm_connector_status status;
 	struct intel_load_detect_pipe tmp;
 	struct drm_modeset_acquire_ctx ctx;
-
+/*
+	int i;
+	for ( i = 0 ; i < 1000 ; i++) {
+		udelay(1000);
+	}
+*/
 	DRM_DEBUG_KMS("[CONNECTOR:%d:%s] force=%d\n",
 		      connector->base.id, connector->name,
 		      force);
