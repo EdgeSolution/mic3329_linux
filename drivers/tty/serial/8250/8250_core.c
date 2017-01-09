@@ -1950,9 +1950,10 @@ static void serial8250_set_mctrl(struct uart_port *port, unsigned int mctrl)
 		mcr |= UART_MCR_OUT1;
 	if (mctrl & TIOCM_OUT2)
 		mcr |= UART_MCR_OUT2;
+#if 0
 	if (mctrl & TIOCM_LOOP)
 		mcr |= UART_MCR_LOOP;
-
+#endif
 	mcr = (mcr & up->mcr_mask) | up->mcr_force | up->mcr;
 
 	serial_port_out(port, UART_MCR, mcr);
