@@ -555,6 +555,45 @@ static struct cpuidle_state avn_cstates[] = {
 		.enter = NULL }
 };
 
+static void cstate_summary(int cstate)
+{
+	struct cstates {
+		unsigned long total;
+		unsigned long c[9]; //c[8] for other cstate
+	};
+
+	static struct cstates count = {0};
+
+	count.total++;
+	switch(cstate){
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+			count.c[cstate]++;
+            break;
+		default:
+			count.c[8]++;
+            break;
+	}
+
+	if (count.total % 100000 == 0) {
+		unsigned long long msr_bits;
+		rdmsrl(MSR_NHM_SNB_PKG_CST_CFG_CTL, msr_bits);
+
+		printk(PREFIX "msr:%0llX, c:%lu, 0:%lu, 1:%lu, 2:%lu, 3:%lu,"
+				" 4:%lu, 5:%lu, 6:%lu, 7:%lu, o:%lu\n",
+				msr_bits, count.total,
+				count.c[0], count.c[1], count.c[2],
+				count.c[3], count.c[4], count.c[5],
+				count.c[6],count.c[7], count.c[8]);
+	}
+}
+
 /**
  * intel_idle
  * @dev: cpuidle_device
@@ -573,6 +612,8 @@ static int intel_idle(struct cpuidle_device *dev,
 	int cpu = smp_processor_id();
 
 	cstate = (((eax) >> MWAIT_SUBSTATE_SIZE) & MWAIT_CSTATE_MASK) + 1;
+
+	cstate_summary(cstate);
 
 	/*
 	 * leave_mm() to avoid costly and often unnecessary wakeups
